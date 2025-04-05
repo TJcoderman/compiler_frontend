@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Language Detector and Executor</title>
+    
+    <!-- CodeMirror CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/python/python.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=JetBrains+Mono:wght@400;600&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Additional CDN Links -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/split.js/1.6.5/split.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <h1>Code Language Detector and Executor</h1>
+        <button id="theme-toggle" aria-label="Toggle theme">
+            <i class="fas fa-moon"></i>
+        </button>
+    </header>
+    
+    <main id="split-container">
+        <div class="editor-section split">
+            <div class="editor-toolbar">
+                <select id="template-select">
+                    <option value="">Select Template</option>
+                    <option value="cpp">C++ Hello World</option>
+                    <option value="java">Java Hello World</option>
+                    <option value="python">Python Hello World</option>
+                </select>
+                <div class="font-controls">
+                    <button id="font-decrease" title="Decrease font size">A-</button>
+                    <span id="font-size">14</span>
+                    <button id="font-increase" title="Increase font size">A+</button>
+                </div>
+                <div class="editor-actions">
+                    <button id="copy-code" title="Copy code"><i class="fas fa-copy"></i></button>
+                    <button id="clear-editor" title="Clear editor"><i class="fas fa-eraser"></i></button>
+                    <button id="download-code" title="Download code"><i class="fas fa-download"></i></button>
+                    <input type="file" id="upload-code" accept=".txt,.cpp,.java,.py" hidden>
+                    <button id="upload-btn" title="Upload code"><i class="fas fa-upload"></i></button>
+                </div>
+            </div>
+            <textarea id="code-editor" placeholder="Write your code here..."></textarea>
+        </div>
+        
+        <div class="result-section split">
+            <div class="language-status">
+                <div class="language-badge">
+                    <i class="fas fa-code"></i>
+                    <span id="detected-language">None</span>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button id="run-btn" disabled>
+                    <i class="fas fa-play"></i> Run Code
+                </button>
+                <button id="ai-debug-btn" title="Feature coming soon">
+                    <i class="fas fa-robot"></i> AI Debug
+                </button>
+            </div>
+            
+            <div class="output-area">
+                <h3>Output <span class="loading-spinner hidden"></span></h3>
+                <pre id="output">Write some code and click Run to see the output.</pre>
+            </div>
+        </div>
+    </main>
+    
+    <script src="script.js"></script>
+</body>
+</html>
