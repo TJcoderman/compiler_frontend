@@ -8,13 +8,89 @@ from django.views.decorators.http import require_http_methods
 import re
 
 def detect_language(code):
-    if re.search(r'import\s+java\.', code):
-        return 'java'
-    elif re.search(r'#include\s*<iostream>', code):
-        return 'cpp'
-    elif re.search(r'def\s+\w+|print\s*\(', code):
+    """Detect programming language using lexical analysis"""
+    # Lexical token definitions (same as original)
+    common_tokens = {
+        'keywords': {'if', 'else', 'for', 'while', 'return', 'break', 'continue'},
+        'operators': {'+', '-', '*', '/', '%', '=', '==', '!=', '<', '>', '<=', '>='},
+        'symbols': {'(', ')', '{', '}', '[', ']', ';', ',', '.'}
+    }
+    
+    python_tokens = {
+        'keywords': {'def', 'lambda', 'class', 'import', 'from', 'as', 'try', 'except', 
+                     'finally', 'with', 'yield', 'elif', 'not', 'in', 'is', 'and', 'or', 
+                     'nonlocal', 'global', 'True', 'False', 'None', 'async', 'await', 'print'},
+        'operators': {'**', '//', ':=', '@'},
+        'symbols': {':', '->', '#', '"""', "'''"}
+    }
+    
+    java_tokens = {
+        'keywords': {'public', 'private', 'protected', 'static', 'void', 'main', 'String', 
+                    'class', 'extends', 'implements', 'interface', 'new', 'this', 'super',
+                    'throws', 'try', 'catch', 'finally', 'int', 'boolean', 'float', 'double'},
+        'operators': {'++', '--', 'instanceof'},
+        'symbols': {'@'},
+        'patterns': [r'System\.out\.println', r'public\s+class']  # NEW: Pattern matching
+    }
+    
+    cpp_tokens = {
+        'keywords': {'public', 'private', 'protected', 'using', 'namespace', 'cout', 'cin', 
+                    'endl', 'template', 'typename', 'constexpr', 'auto', 'decltype', 
+                    'noexcept', 'nullptr', 'const_cast', 'dynamic_cast', 'reinterpret_cast', 
+                    'static_cast', 'virtual', 'override', 'friend', 'operator', 'inline', 
+                    'mutable', 'explicit', 'typedef', 'union', 'goto', 'wchar_t'},
+        'operators': {'->', '::', '<<', '>>', '.*', '->*'},
+        'symbols': {'#include', '/*', '*/'}
+    }
+
+    # Tokenize function
+    def tokenize(code):
+        code = re.sub(r'"[^"]*"', ' STRING ', code)
+        code = re.sub(r"'[^']*'", ' STRING ', code)
+        code = re.sub(r'//.*', ' ', code)
+        code = re.sub(r'/\*.*?\*/', ' ', code, flags=re.DOTALL)
+        return re.findall(r'[a-zA-Z_][\w:]*|\d+\.?\d*|\S', code)
+
+    # Classification functions
+    def is_python_token(token):
+        return (token in python_tokens['keywords'] or 
+                token in python_tokens['operators'] or 
+                token in python_tokens['symbols'])
+
+    def is_java_token(token):
+        # Check basic tokens
+        if (token in java_tokens['keywords'] or 
+            token in java_tokens['operators'] or 
+            token in java_tokens['symbols']):
+            return True
+
+    def is_cpp_token(token):
+        return (token in cpp_tokens['keywords'] or 
+                token in cpp_tokens['operators'] or 
+                token in cpp_tokens['symbols'])
+
+    # Main detection logic
+    tokens = tokenize(code)
+    counts = {'python': 0, 'java': 0, 'cpp': 0}
+
+    for token in tokens:
+        if is_python_token(token):
+            counts['python'] += 1
+        elif is_java_token(token):
+            counts['java'] += 1
+        elif is_cpp_token(token):
+            counts['cpp'] += 1
+
+    max_count = max(counts.values())
+    if max_count == 0:
+        return 'undetected'
+
+    if counts['python'] == max_count:
         return 'python'
-    return 'undetected'
+    elif counts['java'] == max_count:
+        return 'java'
+    else:
+        return 'cpp'
 
 @csrf_exempt
 @require_http_methods(["POST"])
